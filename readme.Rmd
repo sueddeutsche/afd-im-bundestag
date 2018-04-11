@@ -1,0 +1,16 @@
+---
+title: "Untitled"
+author: "Katharina Brunner"
+date: "11 April 2018"
+output: rmarkdown::github_document
+
+---
+
+```{r}
+library(dplyr)
+library(ggplot2)
+
+# import data
+df <- read.csv("data/bundestagsprotokolle_19.csv", sep = "\t", stringsAsFactors = F)
+```
+
