@@ -3,14 +3,18 @@ Daten zu den Bundestagsprotokollen
 Katharina Brunner und Martina Schories
 1.  April 2018
 
--   [Variables](#variables)
+-   [Beschreibung der Daten](#beschreibung-der-daten)
+-   [Beifall](#beifall)
+    -   [Wieviel klatschen die Fraktionen für sich selbst und wieviel für die anderen?](#wieviel-klatschen-die-fraktionen-für-sich-selbst-und-wieviel-für-die-anderen)
+    -   [Wenn eine Partei für andere klatscht, wie oft klatscht dann die ganze Fraktion und wann nur Teile einer Fraktion?](#wenn-eine-partei-für-andere-klatscht-wie-oft-klatscht-dann-die-ganze-fraktion-und-wann-nur-teile-einer-fraktion)
+    -   [Wie viel klatschen die Fraktionen für andere?](#wie-viel-klatschen-die-fraktionen-für-andere)
 -   [Lachen](#lachen)
     -   [Welche Fraktion lacht wie oft?](#welche-fraktion-lacht-wie-oft)
     -   [Über wen lacht die AfD?](#über-wen-lacht-die-afd)
-    -   [Wen lachen die anderen Parteien aus?](#wen-lachen-die-anderen-parteien-aus)
+    -   [Bei welchen Rednern lachen die Fraktionen (ohne AfD)?](#bei-welchen-rednern-lachen-die-fraktionen-ohne-afd)
 
-Variables
----------
+Beschreibung der Daten
+----------------------
 
 <table style="width:100%;">
 <colgroup>
@@ -126,10 +130,102 @@ library(dplyr)
 
 ``` r
 library(ggplot2)
+library(tidyr)
 
 # import data
 df <- read.csv("data/bundestagsprotokolle_19.csv", sep = "\t", stringsAsFactors = F)
 ```
+
+Beifall
+-------
+
+### Wieviel klatschen die Fraktionen für sich selbst und wieviel für die anderen?
+
+``` r
+party_vector <- c("afd", "fdp", "gruene", "linke", "spd", "union")
+
+df_beifall_self <- df %>%  
+  filter(type == "beifall", party == speaker_party) %>% 
+  count(party) %>% 
+  rename(self = n)
+
+df_beifall_others <- df %>% 
+  filter(type == "beifall", party != speaker_party) %>% 
+  count(party)  %>% 
+  rename(others = n)
+
+df_beifall_all <- df %>%
+  filter(type == "beifall") %>% 
+  count(party) %>% 
+  rename(all = n)
+
+df_beifall_all %>% 
+  left_join(df_beifall_self, by = "party") %>% 
+  left_join(df_beifall_others, by = "party") %>% 
+  mutate(share_self = self/all,
+         share_others = others/all) %>% 
+  filter(party %in% party_vector) %>% 
+  arrange(desc(share_self)) %>% 
+  mutate(order = row_number()) %>% 
+  tidyr::gather(type, factor, 5:6) %>% 
+  ggplot(aes(x = reorder(party, -order), y = factor, group = type, fill = type)) +
+    geom_bar(stat = "identity") +
+    scale_y_continuous(labels = scales::percent) +
+    coord_flip() +
+    labs(title = "Anteil des Beifalls für die eigene Fraktion und andere Fraktionen")
+```
+
+![](readme_files/figure-markdown_github/unnamed-chunk-2-1.png)
+
+### Wenn eine Partei für andere klatscht, wie oft klatscht dann die ganze Fraktion und wann nur Teile einer Fraktion?
+
+Die AfD klatscht deutlich weniger für andere. Und wenn sie es doch tut, dann sind das vor allem einzelne Abgeordnete oder nur Teile der Fraktion.
+
+``` r
+df %>% 
+  filter(type == "beifall", party != speaker_party) %>% 
+  count(party, party_action) %>% 
+  spread(party_action, n) %>% 
+  mutate(sum =  `0` +`1`) %>% 
+  arrange(desc(sum)) %>% 
+  mutate(order = row_number()) %>% 
+  rename(ganze_partei = `0`, teile_der_partei = `1`) %>% 
+  gather(party_action, value, -party, -sum, -order) %>% 
+  ggplot(aes(x = reorder(party, -order), y = value, group = party_action, fill = party_action)) +
+  geom_bar(stat = "identity") +
+  coord_flip()
+```
+
+    ## Warning: Removed 1 rows containing missing values (position_stack).
+
+![](readme_files/figure-markdown_github/unnamed-chunk-3-1.png)
+
+### Wie viel klatschen die Fraktionen für andere?
+
+Und wieviel Aufmerksamkeit bekommt die AfD von den anderen Parteien?
+
+``` r
+df %>%  
+  filter(type == "beifall", party != "alle", party != speaker_party) %>% 
+  count(party, speaker_party) %>% 
+  filter(party %in% party_vector, speaker_party %in% party_vector) %>% 
+  spread(speaker_party, n) %>% 
+  rowwise() %>% 
+  mutate(nicht_afd = sum(fdp, gruene, linke, spd, union, na.rm= TRUE)) %>% 
+  arrange(desc(nicht_afd)) %>% 
+  mutate(order = row_number()) %>% 
+  select(party, afd, nicht_afd, order) %>% 
+  gather(type, value, -order, -party) %>% 
+  ggplot(aes(x = reorder(party, -order), y = value, fill = type, group = desc(type))) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(title= "Wie oft die Fraktionen für die AfD oder die anderen Fraktionen klatschen",
+       caption = "Quelle: Bundestag, Analyse: SZ")
+```
+
+    ## Warning: Removed 1 rows containing missing values (position_stack).
+
+![](readme_files/figure-markdown_github/unnamed-chunk-4-1.png)
 
 Lachen
 ------
@@ -147,7 +243,7 @@ df %>%
        caption = "Quelle: Bundestag, Analyse: SZ")
 ```
 
-![](readme_files/figure-markdown_github/unnamed-chunk-2-1.png)
+![](readme_files/figure-markdown_github/unnamed-chunk-5-1.png)
 
 ### Über wen lacht die AfD?
 
@@ -166,9 +262,9 @@ df %>%
        caption = "Quelle: Bundestag, Analyse: SZ")
 ```
 
-![](readme_files/figure-markdown_github/unnamed-chunk-3-1.png)
+![](readme_files/figure-markdown_github/unnamed-chunk-6-1.png)
 
-### Wen lachen die anderen Parteien aus?
+### Bei welchen Rednern lachen die Fraktionen (ohne AfD)?
 
 Die anderen Parteien (insbesondere die SPD) lachen auch vor allem die AfD aus.
 
