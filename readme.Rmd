@@ -1,12 +1,34 @@
 ---
-title: "Untitled"
-author: "Katharina Brunner"
-date: "11 April 2018"
-output: rmarkdown::github_document
-
+title: "Daten zu den Bundestagsprotokollen"
+author: "Katharina Brunner und Martina Schories"
+date: "11. April 2018"
+output:
+  github_document:
+    toc: true
+    toc_depth: 3
 ---
 
-```{r}
+
+
+## Variables
+
+| Column        | Description                                                                                                                                              | Type        |     | 
+|---------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|-----| 
+| sitzung_id    | The number of the debate                                                                                                                                 | int         |     | 
+| text          | original text from protocol                                                                                                                              | chr         |     | 
+| type          | type of action: Beifall, Heiterkeit, Lachen, Widerspruch, Zuruf                                                                                          | chr         |     | 
+| party         | assigned party to action like clapping or interrupting                                                                                                   | chr         |     | 
+| zurufer_name  | name of the person who interrupts                                                                                                                        |   chr          |     | 
+| zuruf_text    | text of the interruption                                                                                                                                 | chr         |     | 
+| speaker_party | party of the speaker                                                                                                                                     | chr         |     | 
+| speaker_name  | the name of the person currently speaking (notion: the speaker is not neccessarily the person at the lectern, e.g. when there is an interposed question) | chr         |     | 
+| speech_id     | id of the speech from XML file                                                                                                                           | chr         |     | 
+| top        | agenda item | chr | 
+| beschreibung  | description of agenda item                                                                                                                               | chr         |     | 
+| zwischenfrage | is the speaker asking a question? If yes `1`, if no `0`                                                                                                  | int         |     | 
+| party_action  | is the whole party clapping, laughing... (`1`) or just parts (`0`)?                                                                                      | int         |     | 
+
+```{r warning=FALSE}
 library(dplyr)
 library(ggplot2)
 
@@ -14,3 +36,50 @@ library(ggplot2)
 df <- read.csv("data/bundestagsprotokolle_19.csv", sep = "\t", stringsAsFactors = F)
 ```
 
+## Lachen
+
+### Welche Fraktion lacht wie oft?
+
+```{r}
+df %>% 
+  filter(type == "lachen") %>% 
+  count(party) %>% 
+  ggplot(aes(x = reorder(party, n), y = n)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(title = "Anzahl des Lachens pro Fraktion",
+       caption = "Quelle: Bundestag, Analyse: SZ")
+
+```
+
+
+### Über wen lacht die AfD?
+
+Die AfD lacht vor allem Sprecher der Union aus. 
+
+```{r}
+df %>% 
+  filter(type == "lachen", party == "afd") %>% 
+  group_by(party, speaker_party) %>% 
+  summarise(n = n()) %>% 
+  mutate(share = n/sum(n)) %>% 
+  ggplot(aes(x = reorder(speaker_party, n), y = n)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(title = "Anzahl des Lachens der AfD pro Fraktion",
+       caption = "Quelle: Bundestag, Analyse: SZ")
+  
+```
+
+### Wen lachen die anderen Parteien aus?
+
+Die anderen Parteien (insbesondere die SPD) lachen auch vor allem die AfD aus. 
+
+```{r}
+df %>% 
+  filter(type == "lachen", party != "afd") %>% 
+  group_by(party, speaker_party) %>% 
+  summarise(n = n()) %>% 
+  mutate(share = n/sum(n)) %>% 
+  arrange(desc(n))
+```
