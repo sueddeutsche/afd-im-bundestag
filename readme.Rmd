@@ -36,6 +36,30 @@ library(ggplot2)
 df <- read.csv("data/bundestagsprotokolle_19.csv", sep = "\t", stringsAsFactors = F)
 ```
 
+## Beifall
+
+### Wieviel klatschen die Fraktionen für sich selbst und wieviel für die anderen?
+```{r}
+df_beifall_self <- df %>%  
+  filter(type == "beifall", party == speaker_party) %>% 
+  group_by(party) %>% 
+  summarise(self = n())
+
+df_beifall_others <- df %>% 
+  filter(type == "beifall", party != speaker_party) %>% 
+  group_by(party) %>% 
+  summarise(others = n())
+
+df_beifall_all <- df %>%
+  filter(type == "beifall") %>% 
+  group_by(party) %>% 
+  summarise(others = n())
+
+
+
+```
+
+
 ## Lachen
 
 ### Welche Fraktion lacht wie oft?
