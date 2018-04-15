@@ -76,6 +76,22 @@ df_beifall_all %>%
 
 ```
 
+Durchschnitt und Standardabweichung: Nur die AfD liegt außerhalb der Standardabweichung.
+
+```{r}
+df_beifall_all %>% 
+  left_join(df_beifall_self, by = "party") %>% 
+  left_join(df_beifall_others, by = "party") %>% 
+  mutate(share_self = self/all,
+         share_others = others/all) %>% 
+  filter(party %in% party_vector) %>% 
+  arrange(desc(share_self)) %>% 
+  mutate(order = row_number()) %>% 
+  tidyr::gather(type, factor, 5:6) %>% 
+  group_by(type) %>% 
+  summarise(mean = mean(factor), sd = sd(factor))
+```
+
 ### Wenn eine Partei für andere klatscht, wie oft klatscht dann die ganze Fraktion und wann nur Teile einer Fraktion?
 
 Die AfD klatscht deutlich weniger für andere. Und wenn sie es doch tut, dann sind das vor allem einzelne Abgeordnete oder nur Teile der Fraktion.
