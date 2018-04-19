@@ -12,6 +12,9 @@ Katharina Brunner und Martina Schories
     -   [Welche Fraktion lacht wie oft?](#welche-fraktion-lacht-wie-oft)
     -   [Über wen lacht die AfD?](#über-wen-lacht-die-afd)
     -   [Bei welchen Rednern lachen die Fraktionen (ohne AfD)?](#bei-welchen-rednern-lachen-die-fraktionen-ohne-afd)
+-   [Absolute Zahlen](#absolute-zahlen)
+
+Stand: 24. Sitzungstag
 
 Beschreibung der Daten
 ----------------------
@@ -134,6 +137,7 @@ library(tidyr)
 
 # import data
 df <- read.csv("data/bundestagsprotokolle_19.csv", sep = "\t", stringsAsFactors = F)
+party_vector <- c("afd", "fdp", "gruene", "linke", "spd", "union")
 ```
 
 Beifall
@@ -142,8 +146,6 @@ Beifall
 ### Wieviel klatschen die Fraktionen für sich selbst und wieviel für die anderen?
 
 ``` r
-party_vector <- c("afd", "fdp", "gruene", "linke", "spd", "union")
-
 df_beifall_self <- df %>%  
   filter(type == "beifall", party == speaker_party) %>% 
   count(party) %>% 
@@ -177,6 +179,28 @@ df_beifall_all %>%
 
 ![](readme_files/figure-markdown_github/unnamed-chunk-2-1.png)
 
+Durchschnitt und Standardabweichung: Nur die AfD liegt außerhalb der Standardabweichung.
+
+``` r
+df_beifall_all %>% 
+  left_join(df_beifall_self, by = "party") %>% 
+  left_join(df_beifall_others, by = "party") %>% 
+  mutate(share_self = self/all,
+         share_others = others/all) %>% 
+  filter(party %in% party_vector) %>% 
+  arrange(desc(share_self)) %>% 
+  mutate(order = row_number()) %>% 
+  tidyr::gather(type, factor, 5:6) %>% 
+  group_by(type) %>% 
+  summarise(mean = mean(factor), sd = sd(factor))
+```
+
+    ## # A tibble: 2 x 3
+    ##   type          mean    sd
+    ##   <chr>        <dbl> <dbl>
+    ## 1 share_others 0.483 0.102
+    ## 2 share_self   0.510 0.104
+
 ### Wenn eine Partei für andere klatscht, wie oft klatscht dann die ganze Fraktion und wann nur Teile einer Fraktion?
 
 Die AfD klatscht deutlich weniger für andere. Und wenn sie es doch tut, dann sind das vor allem einzelne Abgeordnete oder nur Teile der Fraktion.
@@ -198,7 +222,30 @@ df %>%
 
     ## Warning: Removed 1 rows containing missing values (position_stack).
 
-![](readme_files/figure-markdown_github/unnamed-chunk-3-1.png)
+![](readme_files/figure-markdown_github/unnamed-chunk-4-1.png)
+
+Relativ:
+
+``` r
+df %>% 
+  filter(type == "beifall", party != speaker_party) %>% 
+  count(party, party_action) %>% 
+  spread(party_action, n) %>% 
+  mutate(sum =  `0` +`1`) %>% 
+  filter(party %in% party_vector) %>% 
+  mutate(others_all = round(`1`/sum, 2),
+         others_part = round(`0`/sum, 2)) 
+```
+
+    ## # A tibble: 6 x 6
+    ##   party    `0`   `1`   sum others_all others_part
+    ##   <chr>  <int> <int> <int>      <dbl>       <dbl>
+    ## 1 afd      515   148   663      0.220       0.780
+    ## 2 fdp      994   492  1486      0.330       0.670
+    ## 3 gruene   974   726  1700      0.430       0.570
+    ## 4 linke    797   595  1392      0.430       0.570
+    ## 5 spd     1161   776  1937      0.400       0.600
+    ## 6 union    909   525  1434      0.370       0.630
 
 ### Wie viel klatschen die Fraktionen für andere?
 
@@ -225,7 +272,7 @@ df %>%
 
     ## Warning: Removed 1 rows containing missing values (position_stack).
 
-![](readme_files/figure-markdown_github/unnamed-chunk-4-1.png)
+![](readme_files/figure-markdown_github/unnamed-chunk-6-1.png)
 
 Lachen
 ------
@@ -243,7 +290,7 @@ df %>%
        caption = "Quelle: Bundestag, Analyse: SZ")
 ```
 
-![](readme_files/figure-markdown_github/unnamed-chunk-5-1.png)
+![](readme_files/figure-markdown_github/unnamed-chunk-7-1.png)
 
 ### Über wen lacht die AfD?
 
@@ -262,7 +309,7 @@ df %>%
        caption = "Quelle: Bundestag, Analyse: SZ")
 ```
 
-![](readme_files/figure-markdown_github/unnamed-chunk-6-1.png)
+![](readme_files/figure-markdown_github/unnamed-chunk-8-1.png)
 
 ### Bei welchen Rednern lachen die Fraktionen (ohne AfD)?
 
@@ -292,3 +339,27 @@ df %>%
     ##  9 gruene spd                4 0.0580
     ## 10 linke  bundesminister     4 0.0645
     ## # ... with 19 more rows
+
+Absolute Zahlen
+---------------
+
+So oft tauchen die Parteien in den Daten pro Kategorie auf:
+
+``` r
+df %>% 
+  filter(party %in% party_vector, speaker_party %in% party_vector) %>% 
+  count(party, type) %>% 
+  spread(type, n) %>%
+  mutate(sum = rowSums(.[2:6])) %>% 
+  arrange(desc(sum))
+```
+
+    ## # A tibble: 6 x 7
+    ##   party  beifall heiterkeit lachen widerspruch zuruf   sum
+    ##   <chr>    <int>      <int>  <int>       <int> <int> <dbl>
+    ## 1 gruene    2908         64     59          44  1215 4290.
+    ## 2 spd       3160         77     65          38   761 4101.
+    ## 3 union     2931         78     28          15   862 3914.
+    ## 4 linke     2704         34     55          45   949 3787.
+    ## 5 afd       2163         45    146          61  1138 3553.
+    ## 6 fdp       2472         64     29          12   601 3178.

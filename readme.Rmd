@@ -9,6 +9,8 @@ output:
 ---
 
 
+Stand: 24. Sitzungstag
+
 
 ## Beschreibung der Daten
 
@@ -35,14 +37,13 @@ library(tidyr)
 
 # import data
 df <- read.csv("data/bundestagsprotokolle_19.csv", sep = "\t", stringsAsFactors = F)
+party_vector <- c("afd", "fdp", "gruene", "linke", "spd", "union")
 ```
 
 ## Beifall
 
 ### Wieviel klatschen die Fraktionen für sich selbst und wieviel für die anderen?
 ```{r}
-party_vector <- c("afd", "fdp", "gruene", "linke", "spd", "union")
-
 df_beifall_self <- df %>%  
   filter(type == "beifall", party == speaker_party) %>% 
   count(party) %>% 
@@ -72,7 +73,6 @@ df_beifall_all %>%
     scale_y_continuous(labels = scales::percent) +
     coord_flip() +
     labs(title = "Anteil des Beifalls für die eigene Fraktion und andere Fraktionen")
-
 
 ```
 
@@ -110,6 +110,19 @@ df %>%
   ggplot(aes(x = reorder(party, -order), y = value, group = party_action, fill = party_action)) +
   geom_bar(stat = "identity") +
   coord_flip()
+```
+
+Relativ:
+
+```{r}
+df %>% 
+  filter(type == "beifall", party != speaker_party) %>% 
+  count(party, party_action) %>% 
+  spread(party_action, n) %>% 
+  mutate(sum =  `0` +`1`) %>% 
+  filter(party %in% party_vector) %>% 
+  mutate(others_all = round(`1`/sum, 2),
+         others_part = round(`0`/sum, 2)) 
 ```
 
 ### Wie viel klatschen die Fraktionen für andere? 
@@ -184,3 +197,18 @@ df %>%
   mutate(share = n/sum(n)) %>% 
   arrange(desc(n))
 ```
+
+
+## Absolute Zahlen
+
+So oft tauchen die Parteien in den Daten pro Kategorie auf:
+
+```{r}
+df %>% 
+  filter(party %in% party_vector, speaker_party %in% party_vector) %>% 
+  count(party, type) %>% 
+  spread(type, n) %>%
+  mutate(sum = rowSums(.[2:6])) %>% 
+  arrange(desc(sum))
+```
+
