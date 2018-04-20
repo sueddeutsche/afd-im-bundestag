@@ -14,7 +14,7 @@ In diesem Repo veröffentlichen wir die aus den Protokollen [extrahierten Daten]
 * Digitale Reportage: [Das gespaltene Parlament](http://sz.de/afdimbundestag) 
 * Weitere Datenauswertung: [Neuer Bundestag, alte Fronten](http://sz.de/1.3950836)
 * Methodik: [So analysieren wir den Bundestag](http://sz.de/1.3944784)
-* Interview mit einem Stenografen des Bundestags: ["Es ist in alle Richtungen leidenschaftlicher geworden. Keine Frage" ](http://sz.de1.3951366)
+* Interview mit einem Stenografen des Bundestags: ["Es ist in alle Richtungen leidenschaftlicher geworden. Keine Frage" ](http://sz.de/1.3951366)
 
 
 ## Datengrundlage
