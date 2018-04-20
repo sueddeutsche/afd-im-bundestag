@@ -1,36 +1,54 @@
 ---
-title: "Daten zu den Bundestagsprotokollen"
-author: "Katharina Brunner und Martina Schories"
-date: "11. April 2018"
-output:
-  github_document:
-    toc: true
-    toc_depth: 3
+title: "Daten aus Bundestagsprotokollen"
+author: 
+date: 
+output: github_document
 ---
 
+Am 24. April sind sechs Monate seit der konstituierenden Sitzung des 19. Bundestags vergangen. Wie hat sich das Parlament mit dem Einzug der Rechten verändert? Wie prägen die Rechten das Miteinander, das Klima, die Abläufe im Bundestag? Das wieder eine zumindest in Teilen rechtsextreme Partei im Parlament sitzt, ist eine Zäsur in der Geschichte der Bundesrepublik. Angesichts des Verhaltens von AfD-Politikern vor dem Einzug in den Bundestag, ihren Verbindungen zu rechtsextremen Kreisen, ihren teils rechtsradikalen und fremdenfeindlichen Äußerungen erschien es uns wichtig, nachvollziehbar und transparent zu machen, wie Vertreter dieser Partei im Bundestag agieren, wie sie parlamentarische Prozesse beeinflussen. In die Öffentlichkeit gelangen sonst in der Regel nur die besonderen Vorkommnisse, wichtige Entscheidungen, herausragende Reden, extreme Provokationen. Mit der [Datenauswertung aller Protokolle](http://sz.de/afdimbundestag) - nicht nur bestimmter Ereignisse - über einen längeren Zeitraum objektivieren die Wahrnehmung und Bewertung des Geschehens dort.
 
-Stand: 24. Sitzungstag
+In diesem Repo veröffentlichen wir die aus den Protokollen [extrahierten Daten](data/bundestagsprotkolle_19.csv).
 
+## Veröffentlichte Artikel
+
+* Digitale Reportage: [Das gespaltene Parlament](http://sz.de/afdimbundestag) 
+* Weitere Datenauswertung: [Neuer Bundestag, alte Fronten](http://sz.de/1.3950836)
+* Methodik: [So analysieren wir den Bundestag](http://sz.de/1.3944784)
+* Interview mit einem Stenografen des Bundestags: ["Es ist in alle Richtungen leidenschaftlicher geworden. Keine Frage" ](http://sz.de1.3951366)
+
+
+## Datengrundlage
+
+Wenn die Abgeordneten im Bundestag diskutieren, wird jedes gesprochene Wort akribisch dokumentiert. Stenografen sitzen in jeder Plenardebatte und schreiben mit, was um sie herum passiert: Wer was sagt, wer klatscht, wer dazwischenruft, wer lacht, wer einer Aussage widerspricht und wie. Diese Aufzeichnungen landen in seitenlangen Dokumenten ([hier zum Beispiel das Protokoll der ersten Sitzung nach der Bundestagswahl im Oktober](http://dip21.bundestag.de/dip21/btp/19/19001.pdf), die kurz nach der Debatte im Internet veröffentlicht werden. Für die Süddeutsche Zeitung waren sie der Ausgangspunkt der Recherche, um das Auftreten der AfD im Bundestag und den Umgang mit ihr zu analysieren. Mehr zur [Methodik auf SZ.de](http://sz.de/1.3944784).
+
+* [Protokolle des Bundestags als PDF](https://www.bundestag.de/dokumente/protokolle/plenarprotokolle)
+* [Protokolle des Bundestags als XML](https://www.bundestag.de/service/opendata)
 
 ## Beschreibung der Daten
 
-| Column        | Description                                                                                                                                              | Type        |     | 
-|---------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|-----| 
-| sitzung_id    | The number of the debate                                                                                                                                 | int         |     | 
-| text          | original text from protocol                                                                                                                              | chr         |     | 
-| type          | type of action: Beifall, Heiterkeit, Lachen, Widerspruch, Zuruf                                                                                          | chr         |     | 
-| party         | assigned party to action like clapping or interrupting                                                                                                   | chr         |     | 
-| zurufer_name  | name of the person who interrupts                                                                                                                        |   chr          |     | 
-| zuruf_text    | text of the interruption                                                                                                                                 | chr         |     | 
-| speaker_party | party of the speaker                                                                                                                                     | chr         |     | 
-| speaker_name  | the name of the person currently speaking (notion: the speaker is not neccessarily the person at the lectern, e.g. when there is an interposed question) | chr         |     | 
-| speech_id     | id of the speech from XML file                                                                                                                           | chr         |     | 
-| top        | agenda item | chr | 
-| beschreibung  | description of agenda item                                                                                                                               | chr         |     | 
-| zwischenfrage | is the speaker asking a question? If yes `1`, if no `0`                                                                                                  | int         |     | 
-| party_action  | is the whole party clapping, laughing... (`1`) or just parts (`0`)?                                                                                      | int         |     | 
+* Stand: 24. Sitzungstag
+* In diesem Repository gibt es eine [`.csv`-Datei](data/bundestagsprotokolle_19.csv), in der ein Teil unserer extrahierten Daten aus den Bundestagsprotokollen zu finden sind. 
 
-```{r warning=FALSE}
+
+| Variable      | Beschreibung                                                                                                                                                  | 
+|---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------| 
+| sitzung_id    | Sitzungsnmmer                                                                                                                                                 | 
+| text          | Originaltext aus dem Protokoll                                                                                                                                | 
+| type          | Art der Aktion:Beifall, Heiterkeit, Lachen, Widerspruch, Zuruf                                                                                                | 
+| party         | agierende Fraktion                                                                                                                                            | 
+| zurufer_name  | Person, die zuruft                                                                                                                                            | 
+| zuruf_text    | Zuruf im Wortlaut                                                                                                                                             | 
+| speaker_party | Fraktion der sprechenden Person (Anmerkung: Die Person muss nicht notwendigerweise die Person am Rednerpult sein, z.B. wenn jemand eine Zwischenfrage stellt) | 
+| speech_id     |  ID der Rede (aus `XML`-Datei)                                                                                                                                | 
+| top           | Tagesordnungspunkt                                                                                                                                            | 
+| beschreibung  | Beschreibung des Tagesordnungspunkts                                                                                                                          | 
+| party_action  | agierte die ganze Fraktion (`1`) oder Teile der Fraktion (`0`)                                                                                                | 
+
+## Zentrale Auswertungen
+
+Wir fokussieren uns auch die Reaktionen zwischen den Fraktionen. Applaus für moderierende Ämter, wie zum Beispiel für den Bundestagspräsidenten spielen keine Rolle. Rollenbezeichnungen wie `Bundeskanzlerin` haben wir in Fraktionsbezeichnungen umgewandelt.
+
+```{r warning=FALSE, message=F}
 library(dplyr)
 library(ggplot2)
 library(tidyr)
@@ -40,22 +58,36 @@ df <- read.csv("data/bundestagsprotokolle_19.csv", sep = "\t", stringsAsFactors 
 party_vector <- c("afd", "fdp", "gruene", "linke", "spd", "union")
 ```
 
+
+So oft tauchen die Parteien in den Daten pro Kategorie auf:
+
+```{r warning=FALSE, message=F}
+df %>% 
+  filter(party %in% party_vector, speaker_party %in% party_vector) %>% 
+  count(party, type) %>% 
+  spread(type, n) %>%
+  mutate(sum = rowSums(.[2:6])) %>% 
+  arrange(desc(sum))
+```
+
+
 ## Beifall
 
-### Wieviel klatschen die Fraktionen für sich selbst und wieviel für die anderen?
-```{r}
+Wieviel klatschen die Fraktionen für sich selbst und wieviel für die anderen?
+
+```{r warning=FALSE, message=F}
 df_beifall_self <- df %>%  
-  filter(type == "beifall", party == speaker_party) %>% 
+  filter(type == "beifall", party == speaker_party, party %in% party_vector, speaker_party %in% party_vector) %>% 
   count(party) %>% 
   rename(self = n)
 
 df_beifall_others <- df %>% 
-  filter(type == "beifall", party != speaker_party) %>% 
+  filter(type == "beifall", party != speaker_party, party %in% party_vector, speaker_party %in% party_vector) %>% 
   count(party)  %>% 
   rename(others = n)
 
 df_beifall_all <- df %>%
-  filter(type == "beifall") %>% 
+  filter(type == "beifall", party %in% party_vector, speaker_party %in% party_vector) %>% 
   count(party) %>% 
   rename(all = n)
 
@@ -64,7 +96,6 @@ df_beifall_all %>%
   left_join(df_beifall_others, by = "party") %>% 
   mutate(share_self = self/all,
          share_others = others/all) %>% 
-  filter(party %in% party_vector) %>% 
   arrange(desc(share_self)) %>% 
   mutate(order = row_number()) %>% 
   tidyr::gather(type, factor, 5:6) %>% 
@@ -76,30 +107,11 @@ df_beifall_all %>%
 
 ```
 
-Durchschnitt und Standardabweichung: Nur die AfD liegt außerhalb der Standardabweichung.
+Wenn eine Partei für andere klatscht, wie oft klatscht dann die ganze Fraktion und wann nur Teile einer Fraktion?
 
-```{r}
-df_beifall_all %>% 
-  left_join(df_beifall_self, by = "party") %>% 
-  left_join(df_beifall_others, by = "party") %>% 
-  mutate(share_self = self/all,
-         share_others = others/all) %>% 
-  filter(party %in% party_vector) %>% 
-  arrange(desc(share_self)) %>% 
-  mutate(order = row_number()) %>% 
-  tidyr::gather(type, factor, 5:6) %>% 
-  group_by(type) %>% 
-  summarise(mean = mean(factor), sd = sd(factor))
-```
-
-### Wenn eine Partei für andere klatscht, wie oft klatscht dann die ganze Fraktion und wann nur Teile einer Fraktion?
-
-Die AfD klatscht deutlich weniger für andere. Und wenn sie es doch tut, dann sind das vor allem einzelne Abgeordnete oder nur Teile der Fraktion.
-
-```{r}
-
+```{r warning=FALSE, message=F}
 df %>% 
-  filter(type == "beifall", party != speaker_party) %>% 
+  filter(type == "beifall", party != speaker_party, party %in% party_vector, speaker_party %in% party_vector) %>% 
   count(party, party_action) %>% 
   spread(party_action, n) %>% 
   mutate(sum =  `0` +`1`) %>% 
@@ -112,27 +124,11 @@ df %>%
   coord_flip()
 ```
 
-Relativ:
+Wie viel klatschen die Fraktionen für andere? Und wieviel Aufmerksamkeit bekommt die AfD von den anderen Parteien?
 
-```{r}
-df %>% 
-  filter(type == "beifall", party != speaker_party) %>% 
-  count(party, party_action) %>% 
-  spread(party_action, n) %>% 
-  mutate(sum =  `0` +`1`) %>% 
-  filter(party %in% party_vector) %>% 
-  mutate(others_all = round(`1`/sum, 2),
-         others_part = round(`0`/sum, 2)) 
-```
-
-### Wie viel klatschen die Fraktionen für andere? 
-
-Und wieviel Aufmerksamkeit bekommt die AfD von den anderen Parteien?
-
-
-```{r}
+```{r warning=FALSE, message=F}
 df %>%  
-  filter(type == "beifall", party != "alle", party != speaker_party) %>% 
+  filter(type == "beifall", party %in% party_vector, speaker_party %in% party_vector, party != speaker_party) %>% 
   count(party, speaker_party) %>% 
   filter(party %in% party_vector, speaker_party %in% party_vector) %>% 
   spread(speaker_party, n) %>% 
@@ -149,13 +145,45 @@ df %>%
        caption = "Quelle: Bundestag, Analyse: SZ")
 ```
 
+Wer klatscht für wen?
+
+```{r warning=FALSE, message=F}
+
+df %>% 
+  filter(party %in% party_vector, speaker_party %in% party_vector, party != speaker_party, type == "beifall") %>% 
+  count(party, speaker_party) %>% 
+  arrange(desc(n))
+
+```
+
+
+## Zurufe
+
+Welche Fraktion ruft am meisten zu?
+
+```{r warning=FALSE, message=F}
+df %>% 
+  filter(party %in% party_vector, speaker_party %in% party_vector, party != speaker_party, type == "zuruf") %>% 
+  count(party) %>% 
+  arrange(desc(n))
+```
+
+Welche Fraktion ruft wie oft einer anderen zu?
+
+```{r warning=FALSE, message=F}
+df %>% 
+  filter(party %in% party_vector, speaker_party %in% party_vector, party != speaker_party, type == "zuruf") %>% 
+  count(party, speaker_party) %>% 
+  arrange(desc(n))
+```
+
 ## Lachen
 
-### Welche Fraktion lacht wie oft?
+Welche Fraktion lacht wie oft?
 
-```{r}
+```{r warning=FALSE, message=F}
 df %>% 
-  filter(type == "lachen") %>% 
+  filter(type == "lachen", party %in% party_vector, speaker_party %in% party_vector) %>% 
   count(party) %>% 
   ggplot(aes(x = reorder(party, n), y = n)) +
   geom_bar(stat = "identity") +
@@ -165,15 +193,20 @@ df %>%
 
 ```
 
+Wer lacht über wen?
 
-### Über wen lacht die AfD?
-
-Die AfD lacht vor allem Sprecher der Union aus. 
-
-```{r}
-
+```{r warning=FALSE, message=F}
 df %>% 
-  filter(type == "lachen", party == "afd") %>% 
+  filter(type == "lachen", party %in% party_vector, speaker_party %in% party_vector) %>% 
+  count(party, speaker_party) %>% 
+  arrange(desc(n))
+```
+
+Über wen lacht die AfD? Die AfD lacht vor allem Sprecher der Union aus. 
+
+```{r warning=FALSE, message=F}
+df %>% 
+  filter(type == "lachen", party == "afd", party %in% party_vector, speaker_party %in% party_vector) %>% 
   group_by(party, speaker_party) %>% 
   summarise(n = n()) %>% 
   mutate(share = n/sum(n)) %>% 
@@ -185,30 +218,7 @@ df %>%
   
 ```
 
-### Bei welchen Rednern lachen die Fraktionen (ohne AfD)?
 
-Die anderen Parteien (insbesondere die SPD) lachen auch vor allem die AfD aus. 
+## Kontakt
 
-```{r}
-df %>% 
-  filter(type == "lachen", party != "afd") %>% 
-  group_by(party, speaker_party) %>% 
-  summarise(n = n()) %>% 
-  mutate(share = n/sum(n)) %>% 
-  arrange(desc(n))
-```
-
-
-## Absolute Zahlen
-
-So oft tauchen die Parteien in den Daten pro Kategorie auf:
-
-```{r}
-df %>% 
-  filter(party %in% party_vector, speaker_party %in% party_vector) %>% 
-  count(party, type) %>% 
-  spread(type, n) %>%
-  mutate(sum = rowSums(.[2:6])) %>% 
-  arrange(desc(sum))
-```
-
+[Katharina Brunner](katharina.brunner@sz.de) oder [Martina Schories](martina.schories@sz.de)
