@@ -19,7 +19,7 @@ In diesem Repo veröffentlichen wir die aus den Protokollen [extrahierten Daten]
 
 ## Datengrundlage
 
-Wenn die Abgeordneten im Bundestag diskutieren, wird jedes gesprochene Wort akribisch dokumentiert. Stenografen sitzen in jeder Plenardebatte und schreiben mit, was um sie herum passiert: Wer was sagt, wer klatscht, wer dazwischenruft, wer lacht, wer einer Aussage widerspricht und wie. Diese Aufzeichnungen landen in seitenlangen Dokumenten ([hier zum Beispiel das Protokoll der ersten Sitzung nach der Bundestagswahl im Oktober](http://dip21.bundestag.de/dip21/btp/19/19001.pdf), die kurz nach der Debatte im Internet veröffentlicht werden. Für die Süddeutsche Zeitung waren sie der Ausgangspunkt der Recherche, um das Auftreten der AfD im Bundestag und den Umgang mit ihr zu analysieren. Mehr zur [Methodik auf SZ.de](http://sz.de/1.3944784).
+Wenn die Abgeordneten im Bundestag diskutieren, wird jedes gesprochene Wort akribisch dokumentiert. Stenografen sitzen in jeder Plenardebatte und schreiben mit, was um sie herum passiert: Wer was sagt, wer klatscht, wer dazwischenruft, wer lacht, wer einer Aussage widerspricht und wie. Diese Aufzeichnungen landen in seitenlangen Dokumenten ([hier zum Beispiel das Protokoll der ersten Sitzung nach der Bundestagswahl im Oktober](http://dip21.bundestag.de/dip21/btp/19/19001.pdf)), die kurz nach der Debatte im Internet veröffentlicht werden. Für die Süddeutsche Zeitung waren sie der Ausgangspunkt der Recherche, um das Auftreten der AfD im Bundestag und den Umgang mit ihr zu analysieren. Mehr zur [Methodik auf SZ.de](http://sz.de/1.3944784).
 
 * [Protokolle des Bundestags als PDF](https://www.bundestag.de/dokumente/protokolle/plenarprotokolle)
 * [Protokolle des Bundestags als XML](https://www.bundestag.de/service/opendata)
@@ -46,7 +46,7 @@ Wenn die Abgeordneten im Bundestag diskutieren, wird jedes gesprochene Wort akri
 
 ## Zentrale Auswertungen
 
-Wir fokussieren uns auch die Reaktionen zwischen den Fraktionen. Applaus für moderierende Ämter, wie zum Beispiel für den Bundestagspräsidenten spielen keine Rolle. Rollenbezeichnungen wie `Bundeskanzlerin` haben wir in Fraktionsbezeichnungen umgewandelt.
+Wir fokussieren uns auf die Reaktionen zwischen den Fraktionen. Applaus für moderierende Ämter, wie zum Beispiel für den Bundestagspräsidenten spielen keine Rolle. Rollenbezeichnungen wie `Bundeskanzlerin` haben wir in Fraktionsbezeichnungen umgewandelt.
 
 ```{r warning=FALSE, message=F}
 library(dplyr)
@@ -117,7 +117,7 @@ df %>%
   mutate(sum =  `0` +`1`) %>% 
   arrange(desc(sum)) %>% 
   mutate(order = row_number()) %>% 
-  rename(ganze_partei = `0`, teile_der_partei = `1`) %>% 
+  rename(teile_der_partei = `0`, ganze_partei = `1`) %>% 
   gather(party_action, value, -party, -sum, -order) %>% 
   ggplot(aes(x = reorder(party, -order), y = value, group = party_action, fill = party_action)) +
   geom_bar(stat = "identity") +
@@ -130,7 +130,6 @@ Wie viel klatschen die Fraktionen für andere? Und wieviel Aufmerksamkeit bekomm
 df %>%  
   filter(type == "beifall", party %in% party_vector, speaker_party %in% party_vector, party != speaker_party) %>% 
   count(party, speaker_party) %>% 
-  filter(party %in% party_vector, speaker_party %in% party_vector) %>% 
   spread(speaker_party, n) %>% 
   rowwise() %>% 
   mutate(nicht_afd = sum(fdp, gruene, linke, spd, union, na.rm= TRUE)) %>% 
@@ -150,7 +149,7 @@ Wer klatscht für wen?
 ```{r warning=FALSE, message=F}
 
 df %>% 
-  filter(party %in% party_vector, speaker_party %in% party_vector, party != speaker_party, type == "beifall") %>% 
+  filter(type == "beifall", party %in% party_vector, speaker_party %in% party_vector, party != speaker_party) %>% 
   count(party, speaker_party) %>% 
   arrange(desc(n))
 
@@ -163,7 +162,7 @@ Welche Fraktion ruft am meisten zu?
 
 ```{r warning=FALSE, message=F}
 df %>% 
-  filter(party %in% party_vector, speaker_party %in% party_vector, party != speaker_party, type == "zuruf") %>% 
+  filter(type == "zuruf", party %in% party_vector, speaker_party %in% party_vector, party != speaker_party) %>% 
   count(party) %>% 
   arrange(desc(n))
 ```
@@ -172,7 +171,7 @@ Welche Fraktion ruft wie oft einer anderen zu?
 
 ```{r warning=FALSE, message=F}
 df %>% 
-  filter(party %in% party_vector, speaker_party %in% party_vector, party != speaker_party, type == "zuruf") %>% 
+  filter(type == "zuruf", party %in% party_vector, speaker_party %in% party_vector, party != speaker_party) %>% 
   count(party, speaker_party) %>% 
   arrange(desc(n))
 ```
@@ -219,6 +218,4 @@ df %>%
 ```
 
 
-## Kontakt
 
-[Katharina Brunner](katharina.brunner@sz.de) oder [Martina Schories](martina.schories@sz.de)
